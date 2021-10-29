@@ -75,7 +75,7 @@ export class ReconnectingWebSocket extends CommonReconnectingWebSocket implement
                 }
                 resolve(getOk());
             });
-            this.socket.on('ping', () => this.heartbeat);
+            this.socket.on('ping', () => this.heartbeat());
             this.socket.addEventListener('close', (ev: WebSocket.CloseEvent) => {
                 resolve(getOk());
                 clearTimeout(this.pingTimeout!);

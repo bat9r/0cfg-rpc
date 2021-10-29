@@ -30,7 +30,6 @@ import {AnyRequestReplyService} from './RequestReplyService';
 import {AnyBidiStreamService, AnyBidiStreamServiceFactory} from './BidiStreamService';
 import {AnyServerStreamService, AnyServerStreamServiceFactory} from './ServerStreamService';
 import {Middleware} from './Middleware';
-import {noOp} from '@0cfg/utils-common/lib/noOp';
 import {definedValues} from '@0cfg/utils-common/lib/definedValues';
 
 const UNKNOWN_REQUEST_ID = 0;
@@ -591,11 +590,11 @@ export class RpcServer<Context extends HttpContext> {
         socket.on(WebSocketEvent.Message, async (rawMessage: WebSocket.Data) =>
             this.handleClientMessage(bidiStreams, serverStreams, mutableContext, rawMessage, socket));
 
-        await this.disconnectedOrBroken(socket);
+        await this.handleDisconnectedOrBroken(socket);
         [...definedValues(bidiStreams), ...definedValues(serverStreams)].forEach(stream => stream.complete);
     }
 
-    private async disconnectedOrBroken(socket: WebSocket): Promise<Reply> {
+    private async handleDisconnectedOrBroken(socket: WebSocket): Promise<Reply> {
         let isAlive = true;
         let propagateDisconnect: ((reply: Reply) => void) | undefined = undefined;
         const awaitableDisconnect = new Promise<Reply>(resolve => {
@@ -607,20 +606,23 @@ export class RpcServer<Context extends HttpContext> {
             isAlive = true;
         });
 
-        const interval = setInterval(() => {
-            if (isAlive === false) {
-                clearInterval(interval);
+        // Ping at least once every second to keep the socket connection alive.
+        const pingInterval = setInterval(() => socket.ping(), milliSecondsInASecond);
+        const liveCheckInterval = setInterval(() => {
+            if (!isAlive) {
+                clearInterval(liveCheckInterval);
                 socket.terminate();
                 propagateDisconnect!(
                     disconnectedDueToTimeout(this.config.connectionTimeout));
                 return;
             }
             isAlive = false;
-            socket.ping(noOp);
+            socket.ping();
         }, this.config.connectionTimeout);
 
         const gracefulDisconnect = () => {
-            clearInterval(interval);
+            clearInterval(liveCheckInterval);
+            clearInterval(pingInterval);
             propagateDisconnect!(getOk());
         };
 

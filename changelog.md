@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Increase the reconnecting websocket connection timeout.
 - Added support of log output in JSON format
+- The RpcServer now pings websocket clients every second.
 
 ## [0.0.9]
 
