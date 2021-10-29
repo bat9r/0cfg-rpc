@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [unreleased]
 
 - Increase the reconnecting websocket connection timeout.
+- Added support of log output in JSON format
 
 ## [0.0.9]
 
