@@ -65,7 +65,7 @@ export class Reply<T = never, S extends Status = Status> {
     } as SerializedReply<never, Status.Ok>, undefined);
     private readonly serializedReply: SerializedReply<T, S>
     private readonly stack: S extends Status.Ok ? undefined : string;
-    private static logAsJson : boolean = false;
+    private static logAsJson: boolean = false;
 
     /**
      * Never change to public, use composition (wrap a Reply) instead of inheritance.

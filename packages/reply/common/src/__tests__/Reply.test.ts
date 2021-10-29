@@ -21,13 +21,15 @@ test('jsonLogTest', () => {
     expect(consoleSpy.mock.calls[0][0]).toMatch(new RegExp(`{\\"date\\":\\"\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?(([+-]\\d\\d:\\d\\d)|Z)?\\",\\"stack\\":\\"[^\\"]*\\",\\"message\\":\\"${message}\\",\\"code\\":\\"[^\"]*\\",\\"tags":\\[\\]}`));
     ERR_STATUS2.log();
     expect(consoleSpy.mock.calls[2][0]).toMatch(new RegExp(`{\\"date\\":\\"\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?(([+-]\\d\\d:\\d\\d)|Z)?\\",\\"stack\\":\\"[^\\"]*\\",\\"message\\":\\"Das isch en anerer Tescht.\\",\\"code\\":\\"[^\"]*\\",\\"tags":\\[\\]}`));
-    Reply.setLogAsJson(false)
 });
 
 test('plainLogTest', () => {
+    Reply.setLogAsJson(false)
     const consoleSpy = jest.spyOn(console, 'log');
     ERR_STATUS.log(); 
-    expect(consoleSpy.mock.calls[0][0]).toMatch(message);
+    expect(consoleSpy.mock.calls[4][0]).toMatch(new RegExp(`\\[Error,\\s\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?(([+-]\\d\\d:\\d\\d)|Z)?\]:\\s${message}`));
+    ERR_STATUS2.log(); 
+    expect(consoleSpy.mock.calls[5][0]).toMatch(new RegExp(`\\[Error,\\s\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?(([+-]\\d\\d:\\d\\d)|Z)?\]:\\sDas isch en anerer Tescht.`));
 });
 
 test('okAndNotOk', () => {
